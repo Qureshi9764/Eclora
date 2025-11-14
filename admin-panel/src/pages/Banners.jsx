@@ -94,7 +94,7 @@ const Banners = () => {
     formData.append('image', file);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://eclora.onrender.com/api';
       const response = await fetch(`${apiUrl}/upload`, {
         method: 'POST',
         headers: {
