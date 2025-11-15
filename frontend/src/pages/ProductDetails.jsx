@@ -227,7 +227,7 @@ const ProductDetails = () => {
             <ul className="space-y-2 text-sm text-gray-700">
               <li>✓ 100% Natural Ingredients</li>
               <li>✓ Hand-poured with Love</li>
-              <li>✓ Long-lasting Fragrance</li>
+              <li>✓ Long-lasting Aroma</li>
               <li>✓ Eco-friendly Packaging</li>
               <li>✓ Cruelty-free & Vegan</li>
             </ul>

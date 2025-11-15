@@ -13,7 +13,7 @@ exports.getSettings = async (req, res, next) => {
         storeName: 'Eclora',
         storeEmail: 'contact@eclora.com',
         homepageTitle: 'Welcome to Eclora',
-        homepageSubtitle: 'Premium Handmade Candles & Floral Fragrances',
+        homepageSubtitle: 'Premium Handmade Candles, Bouquets, and Curated Gifts',
         footerText: '© 2024 Eclora. All rights reserved.',
       });
     }

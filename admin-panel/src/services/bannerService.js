@@ -2,7 +2,7 @@ import api from './api';
 
 export const bannerService = {
   getAllBanners: async () => {
-    const response = await api.get('/banners');
+    const response = await api.get('/banners/admin');
     return response.data;
   },
 

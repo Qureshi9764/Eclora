@@ -4,10 +4,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
-import { Save } from 'lucide-react';
+import { Save, Database } from 'lucide-react';
 import toast from 'react-hot-toast';
 import settingsService from '../services/settingsService';
 import { useState } from 'react';
+import seedService from '../services/seedService';
 
 const schema = yup.object().shape({
   storeName: yup.string().required('Store name is required'),
@@ -25,6 +26,7 @@ const schema = yup.object().shape({
 const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   const {
     register,
@@ -66,6 +68,20 @@ const Settings = () => {
       toast.error('Failed to update settings');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSeedCatalog = async () => {
+    try {
+      setSeeding(true);
+      const response = await seedService.seedCatalog();
+      const message = response?.message || 'Sample catalog synced';
+      toast.success(message);
+    } catch (error) {
+      console.error('Error seeding catalog:', error);
+      toast.error(error.response?.data?.message || 'Failed to sync catalog data');
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -219,7 +235,7 @@ const Settings = () => {
                 {...register('homepageSubtitle')}
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lavender-500 focus:border-transparent"
-                placeholder="Discover our premium handmade candles and floral fragrances"
+                placeholder="Discover our premium handmade candles, bouquets, and curated gifts"
               />
             </div>
 
@@ -244,6 +260,28 @@ const Settings = () => {
           </Button>
         </div>
       </form>
+
+      {/* Demo Catalog Seeder */}
+      <div className="bg-white rounded-lg shadow-md p-6 border border-dashed border-gray-200">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">Demo Catalog Content</h2>
+            <p className="text-gray-600 mt-1 max-w-2xl">
+              Need sample categories and products (candles, bouquets, custom gifting, hijabi essentials) on your storefront?
+              Seed the database with curated demo content using the button below. This action is safe to run multiple times.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            icon={<Database size={18} />}
+            loading={seeding}
+            onClick={handleSeedCatalog}
+          >
+            Seed Catalog Data
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -39,7 +39,7 @@ const About = () => {
             <p className="text-gray-700 leading-relaxed mb-4">
               Eclora was born from a passion for creating beautiful, sustainable, and aromatic experiences
               for your home. Founded in 2020, we started with a simple mission: to bring handcrafted,
-              natural candles and fragrances into homes worldwide.
+              natural candles and joyful gifting into homes worldwide.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
               Every candle we create is hand-poured with care, using only the finest natural ingredients.
@@ -106,7 +106,7 @@ const About = () => {
               "I started Eclora because I wanted to create something meaningful – products that not only
               smell amazing but also support a sustainable lifestyle. Each candle represents hours of
               experimentation, testing, and love. When you light an Eclora candle, you're not just
-              enjoying a fragrance; you're supporting ethical craftsmanship and environmental responsibility."
+              enjoying a candlelit ritual; you're supporting ethical craftsmanship and environmental responsibility."
             </p>
             <p className="text-accent font-semibold">- Sarah Chen, Founder & Creative Director</p>
           </motion.div>

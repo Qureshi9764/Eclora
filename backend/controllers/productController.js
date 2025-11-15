@@ -14,6 +14,7 @@ exports.getAllProducts = async (req, res, next) => {
       minPrice,
       maxPrice,
       search,
+      product,
       page = 1,
       limit = 12,
       featured,
@@ -58,6 +59,10 @@ exports.getAllProducts = async (req, res, next) => {
 
     if (brand) {
       query.brand = brand;
+    }
+
+    if (product) {
+      query.name = { $regex: new RegExp(`^${product}$`, 'i') };
     }
 
     if (minPrice || maxPrice) {

@@ -1,6 +1,6 @@
 # Eclora Backend API
 
-Backend API for Eclora eCommerce platform - Handcrafted Candles & Fragrances
+Backend API for Eclora eCommerce platform - Handcrafted Candles & Gifting
 
 ## Tech Stack
 

@@ -1,6 +1,6 @@
 # Eclora Frontend
 
-Modern eCommerce website for Eclora - Premium Handcrafted Candles & Fragrances
+Modern eCommerce website for Eclora - Premium Handcrafted Candles & Gifting
 
 ## Tech Stack
 

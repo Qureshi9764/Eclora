@@ -1,4 +1,4 @@
-# 🕯️ Eclora - Handcrafted Candles & Fragrances eCommerce
+# 🕯️ Eclora - Handcrafted Candles & Gifting eCommerce
 
 A premium, full-stack eCommerce website for Eclora, featuring elegant design, modern animations, and complete shopping functionality.
 

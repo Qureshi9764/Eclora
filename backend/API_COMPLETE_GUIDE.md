@@ -132,9 +132,9 @@ This document confirms all backend APIs have been created and configured properl
 1. Go to Categories
 2. Create these categories:
    - Candles
-   - Floral Fragrance  
-   - Gift Sets
-   - Essential Oils
+   - Bouquets
+   - Custom Gifting
+   - Hijabi Essentials
 
 ### **Step 2: Create Test Products**
 

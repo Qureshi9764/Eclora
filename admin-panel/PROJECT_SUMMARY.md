@@ -2,7 +2,7 @@
 
 ## 📌 Project Overview
 
-A comprehensive, production-ready admin panel for **Eclora** - a premium handmade candles and floral fragrances eCommerce platform. Built with modern technologies and best practices to provide seamless management of all store operations.
+A comprehensive, production-ready admin panel for **Eclora** - a premium handmade candles and gifting eCommerce platform. Built with modern technologies and best practices to provide seamless management of all store operations.
 
 ## ✨ Key Features Implemented
 

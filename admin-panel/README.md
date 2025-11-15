@@ -1,6 +1,6 @@
 # Eclora Admin Panel
 
-A fully functional admin panel for managing the Eclora eCommerce platform - a premium handmade candle and floral fragrance online store.
+A fully functional admin panel for managing the Eclora eCommerce platform - a premium handmade candle and gifting online store.
 
 ## 🚀 Features
 
@@ -341,4 +341,4 @@ For issues or questions, contact the development team or open an issue in the re
 
 ---
 
-Built with ❤️ for Eclora - Premium Handmade Candles & Floral Fragrances
+Built with ❤️ for Eclora - Premium Handmade Candles & Gifting

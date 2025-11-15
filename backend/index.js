@@ -20,6 +20,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const seedRoutes = require('./routes/seedRoutes');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -85,6 +86,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/seed', seedRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api/contact', contactRoutes);
 

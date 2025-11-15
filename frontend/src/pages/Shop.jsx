@@ -11,20 +11,26 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(['All']);
+  const [productOptions, setProductOptions] = useState(['All']);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
-    brand: '',
+    product: '',
     minPrice: 0,
     maxPrice: 1000,
     search: '',
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const brands = ['All', 'Eclora Signature', 'Botanical Bliss', 'Pure Essence'];
-
   useEffect(() => {
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchProductOptions(filters.category);
+  }, [filters.category]);
+
+  useEffect(() => {
     fetchProducts();
   }, [filters]);
 
@@ -37,7 +43,23 @@ const Shop = () => {
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback to default categories
-      setCategories(['All', 'Candles', 'Floral Fragrance', 'Gift Sets', 'Home Decor']);
+      setCategories(['All', 'Candles', 'Bouquets', 'Custom Gifting', 'Hijabi Essentials']);
+    }
+  };
+
+  const fetchProductOptions = async (categoryValue = '') => {
+    try {
+      const params = {
+        limit: 100,
+        ...(categoryValue && categoryValue !== 'All' && { category: categoryValue }),
+      };
+      const response = await productService.getAllProducts(params);
+      const allProducts = response.data || [];
+      const names = Array.from(new Set(allProducts.map((product) => product.name))).sort();
+      setProductOptions(['All', ...names]);
+    } catch (error) {
+      console.error('Error fetching product options:', error);
+      setProductOptions(['All']);
     }
   };
 
@@ -46,8 +68,8 @@ const Shop = () => {
       setLoading(true);
       const params = {
         ...(filters.category && filters.category !== 'All' && { category: filters.category }),
-        ...(filters.brand && filters.brand !== 'All' && { brand: filters.brand }),
         ...(filters.search && { search: filters.search }),
+        ...(filters.product && filters.product !== 'All' && { product: filters.product }),
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,
       };
@@ -61,7 +83,13 @@ const Shop = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => {
+      const nextState = { ...prev, [key]: value };
+      if (key === 'category') {
+        nextState.product = '';
+      }
+      return nextState;
+    });
     if (key === 'category') {
       setSearchParams(value && value !== 'All' ? { category: value } : {});
     }
@@ -75,7 +103,7 @@ const Shop = () => {
   const clearFilters = () => {
     setFilters({
       category: '',
-      brand: '',
+      product: '',
       minPrice: 0,
       maxPrice: 1000,
       search: '',
@@ -88,7 +116,7 @@ const Shop = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-heading font-bold text-secondary mb-4">Shop</h1>
-        <p className="text-gray-600">Explore our complete collection of handcrafted candles and fragrances</p>
+        <p className="text-gray-600">Explore our curated mix of candles, bouquets, custom gifting, and hijabi essentials</p>
       </div>
 
       {/* Search Bar */}
@@ -158,20 +186,20 @@ const Shop = () => {
               </div>
             </div>
 
-            {/* Brand Filter */}
+            {/* Product Filter */}
             <div className="mb-6">
-              <h3 className="font-semibold text-text mb-3">Brand</h3>
+              <h3 className="font-semibold text-text mb-3">Product</h3>
               <div className="space-y-2">
-                {brands.map((brand) => (
-                  <label key={brand} className="flex items-center space-x-2 cursor-pointer">
+                {productOptions.map((productName) => (
+                  <label key={productName} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="radio"
-                      name="brand"
-                      checked={filters.brand === brand || (brand === 'All' && !filters.brand)}
-                      onChange={() => handleFilterChange('brand', brand === 'All' ? '' : brand)}
+                      name="product"
+                      checked={filters.product === productName || (productName === 'All' && !filters.product)}
+                      onChange={() => handleFilterChange('product', productName === 'All' ? '' : productName)}
                       className="text-accent focus:ring-accent"
                     />
-                    <span className="text-sm text-gray-700">{brand}</span>
+                    <span className="text-sm text-gray-700">{productName}</span>
                   </label>
                 ))}
               </div>

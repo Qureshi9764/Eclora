@@ -20,7 +20,7 @@ const Footer = () => {
           <div>
             <h3 className="text-2xl font-heading font-bold mb-4 text-primary">Eclora</h3>
             <p className="text-gray-300 text-sm mb-4">
-              Handcrafted candles and fragrances made with love and care for your home.
+              Handcrafted candles, bouquets, and gifting made with love and care for your home.
             </p>
             <div className="flex space-x-4">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
