@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { loginStart, loginSuccess, loginFailure } from '../store/slices/authSlice';
+import { fetchWishlist } from '../store/slices/wishlistSlice';
+import { fetchCart } from '../store/slices/cartSlice';
 import { authService } from '../services/authService';
 
 const schema = yup.object().shape({
@@ -15,9 +17,14 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Get redirect path from location state or default to home
+  const from = location.state?.from || '/';
+  const requireAuth = location.state?.requireAuth || false;
 
   const {
     register,
@@ -40,7 +47,24 @@ const Login = () => {
           user: response.data.user,
           token: response.data.token,
         }));
-        navigate('/');
+        // Fetch wishlist and cart from backend after login
+        dispatch(fetchWishlist());
+        dispatch(fetchCart());
+        
+        // Check if there's a buyNowProduct in sessionStorage
+        const buyNowProduct = sessionStorage.getItem('buyNowProduct');
+        if (buyNowProduct && requireAuth) {
+          // Clear sessionStorage and navigate to checkout with product data
+          sessionStorage.removeItem('buyNowProduct');
+          navigate('/checkout', {
+            state: {
+              buyNowProduct: JSON.parse(buyNowProduct),
+            },
+          });
+        } else {
+          // Navigate to the original destination or home
+          navigate(from);
+        }
       }
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
@@ -127,7 +151,11 @@ const Login = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="text-accent hover:text-primary font-semibold transition-colors">
+              <Link 
+                to="/register" 
+                state={{ from, requireAuth }}
+                className="text-accent hover:text-primary font-semibold transition-colors"
+              >
                 Sign up
               </Link>
             </p>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiHeart, FiMinus, FiPlus } from 'react-icons/fi';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../store/slices/cartSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCartAsync } from '../store/slices/cartSlice';
+import { addToWishlistAsync, removeFromWishlistAsync, isInWishlist } from '../store/slices/wishlistSlice';
 import { productService } from '../services/productService';
 import ProductCard from '../components/ProductCard';
 import Loader from '../components/Loader';
@@ -11,11 +12,17 @@ import Loader from '../components/Loader';
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  
+  const inWishlist = useSelector((state) => 
+    product ? isInWishlist(state, product._id) : false
+  );
 
   useEffect(() => {
     fetchProductDetails();
@@ -49,7 +56,48 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
-    dispatch(addToCart({ ...product, quantity }));
+    dispatch(addToCartAsync({ ...product, quantity }));
+  };
+
+  const handleBuyNow = () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store product data in sessionStorage for after login
+      const buyNowProduct = {
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image || product.images?.[0],
+        quantity: quantity,
+        description: product.description,
+      };
+      sessionStorage.setItem('buyNowProduct', JSON.stringify(buyNowProduct));
+      // Redirect to login with return URL
+      navigate('/login', { state: { from: '/checkout', requireAuth: true } });
+      return;
+    }
+    
+    // Navigate to checkout with product data (direct purchase, not adding to cart)
+    navigate('/checkout', {
+      state: {
+        buyNowProduct: {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.image || product.images?.[0],
+          quantity: quantity,
+          description: product.description,
+        },
+      },
+    });
+  };
+
+  const handleWishlistToggle = () => {
+    if (inWishlist) {
+      dispatch(removeFromWishlistAsync(product._id));
+    } else {
+      dispatch(addToWishlistAsync(product));
+    }
   };
 
   const incrementQuantity = () => {
@@ -203,21 +251,39 @@ const ProductDetails = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
-              className={`flex-1 flex items-center justify-center space-x-2 px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105 ${
+              className={`flex-1 flex items-center justify-center space-x-2 px-6 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg border-2 ${
+                product.stock === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300'
+                  : 'bg-white border-accent text-accent hover:bg-primary hover:text-accent hover:border-accent'
+              }`}
+            >
+              <FiShoppingCart size={18} />
+              <span>Add to Cart</span>
+            </button>
+            <button
+              onClick={handleBuyNow}
+              disabled={product.stock === 0}
+              className={`flex-1 px-6 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg ${
                 product.stock === 0
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-accent text-white hover:bg-primary hover:text-secondary'
               }`}
             >
-              <FiShoppingCart size={20} />
-              <span>Add to Cart</span>
+              Buy Now
             </button>
-            <button className="bg-white border-2 border-accent text-accent px-6 py-4 rounded-full hover:bg-accent hover:text-white transition-all transform hover:scale-105 flex items-center justify-center">
-              <FiHeart size={20} />
+            <button
+              onClick={handleWishlistToggle}
+              className={`border-2 px-4 py-3.5 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-sm hover:shadow-md ${
+                inWishlist
+                  ? 'bg-accent border-accent text-white hover:bg-red-500'
+                  : 'bg-white border-accent text-accent hover:bg-accent hover:text-white'
+              }`}
+            >
+              <FiHeart size={18} className={inWishlist ? 'fill-current' : ''} />
             </button>
           </div>
 

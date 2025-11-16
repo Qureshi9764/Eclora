@@ -1,12 +1,14 @@
-import { useState } from 'react';
+  import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { FiLock, FiCreditCard, FiShield } from 'react-icons/fi';
 import { paymentService } from '../services/paymentService';
-import { clearCart } from '../store/slices/cartSlice';
+import { clearCartAsync } from '../store/slices/cartSlice';
+import PaymentProcessing from '../components/PaymentProcessing';
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -21,11 +23,23 @@ const schema = yup.object().shape({
 });
 
 const Checkout = () => {
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const location = useLocation();
+  const { items: cartItems, totalAmount: cartTotalAmount } = useSelector((state) => state.cart);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  
+  // Check if this is a direct buy now purchase
+  const buyNowProduct = location.state?.buyNowProduct;
+  const isDirectPurchase = !!buyNowProduct;
+  
+  // Use buy now product if available, otherwise use cart items
+  const items = isDirectPurchase ? [buyNowProduct] : cartItems;
+  const totalAmount = isDirectPurchase 
+    ? (buyNowProduct.price * buyNowProduct.quantity)
+    : cartTotalAmount;
 
   const {
     register,
@@ -43,6 +57,7 @@ const Checkout = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
+      setProcessingPayment(true);
       
       // Prepare order data
       const orderData = {
@@ -51,7 +66,9 @@ const Checkout = () => {
           productId: item._id,
           name: item.name,
           price: item.price,
-          quantity: item.quantity,
+          quantity: item.quantity || 1,
+          description: item.description || '',
+          image: item.image || item.images?.[0] || '',
         })),
         shippingAddress: {
           firstName: data.firstName,
@@ -70,27 +87,81 @@ const Checkout = () => {
       // Process checkout (Stripe or Demo mode)
       const result = await paymentService.redirectToCheckout(orderData);
       
-      // If demo mode, show success message and clear cart
+      // If demo mode, show success message and clear cart (only if not direct purchase)
       if (result && result.success) {
-        alert(`✅ Order placed successfully!\n\nOrder ID: ${result.orderId}\n\nThis is a DEMO order. In production, you would be redirected to Stripe payment.`);
-        dispatch(clearCart());
-        navigate('/');
+        setProcessingPayment(false);
+        // Only clear cart if this was a regular checkout, not a direct purchase
+        if (!isDirectPurchase) {
+          dispatch(clearCartAsync());
+        }
+        navigate('/success', { 
+          state: { 
+            orderId: result.orderId,
+            isDemo: true 
+          } 
+        });
       }
+      // Note: If Stripe is configured, redirectToCheckout will redirect to Stripe
+      // and we won't reach this point. The success page will be loaded via Stripe redirect.
     } catch (error) {
       console.error('Checkout error:', error);
-      alert(`❌ Checkout Error: ${error.message}\n\nPlease try again or contact support.`);
+      setProcessingPayment(false);
+      
+      // Show more detailed error message
+      const errorMessage = error.response?.data?.message || error.message || 'An unknown error occurred';
+      const errorDetails = error.response?.data?.details || error.response?.data?.received || '';
+      
+      alert(`❌ Checkout Error: ${errorMessage}${errorDetails ? `\n\nDetails: ${JSON.stringify(errorDetails)}` : ''}\n\nPlease try again or contact support.`);
     } finally {
       setLoading(false);
     }
   };
 
-  if (items.length === 0) {
-    navigate('/cart');
+  // Redirect if user is not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // Store buyNowProduct in sessionStorage if it exists
+      if (buyNowProduct) {
+        sessionStorage.setItem('buyNowProduct', JSON.stringify(buyNowProduct));
+      }
+      navigate('/login', { state: { from: '/checkout', requireAuth: true } });
+      return;
+    }
+    
+    // Check for buyNowProduct in sessionStorage (from login redirect)
+    if (!buyNowProduct && !isDirectPurchase) {
+      const storedProduct = sessionStorage.getItem('buyNowProduct');
+      if (storedProduct) {
+        const parsedProduct = JSON.parse(storedProduct);
+        // Update location state with stored product
+        navigate('/checkout', {
+          state: { buyNowProduct: parsedProduct },
+          replace: true,
+        });
+        sessionStorage.removeItem('buyNowProduct');
+        return;
+      }
+    }
+    
+    // Redirect if no items (and not a direct purchase)
+    if (!isDirectPurchase && cartItems.length === 0) {
+      navigate('/cart');
+    }
+  }, [isAuthenticated, isDirectPurchase, cartItems.length, navigate, buyNowProduct]);
+
+  // Show nothing while redirecting
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  if (!isDirectPurchase && cartItems.length === 0) {
     return null;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      {processingPayment && <PaymentProcessing />}
+      <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-heading font-bold text-secondary mb-8">Checkout</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -254,12 +325,40 @@ const Checkout = () => {
               </div>
             </div>
 
+            {/* Security Badges */}
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-center space-x-6 text-sm">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <FiLock className="text-accent" size={18} />
+                  <span>Secure Payment</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <FiShield className="text-accent" size={18} />
+                  <span>SSL Encrypted</span>
+                </div>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <FiCreditCard className="text-accent" size={18} />
+                  <span>Powered by Stripe</span>
+                </div>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-accent text-white py-4 rounded-full font-semibold hover:bg-primary hover:text-secondary transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-accent text-white py-4 rounded-full font-semibold hover:bg-primary hover:text-secondary transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
-              {loading ? 'Processing...' : 'Continue to Payment'}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <FiLock size={20} />
+                  <span>Continue to Payment</span>
+                </>
+              )}
             </button>
           </form>
         </div>
@@ -275,10 +374,10 @@ const Checkout = () => {
               {items.map((item) => (
                 <div key={item._id} className="flex justify-between text-sm">
                   <span className="text-gray-600">
-                    {item.name} x {item.quantity}
+                    {item.name} x {item.quantity || 1}
                   </span>
                   <span className="font-semibold text-text">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -305,7 +404,8 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

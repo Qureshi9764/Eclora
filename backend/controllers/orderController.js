@@ -216,3 +216,31 @@ exports.updateOrderStatus = async (req, res, next) => {
   }
 };
 
+// @desc    Get order by Stripe session ID
+// @route   GET /api/orders/session/:sessionId
+// @access  Public
+exports.getOrderBySession = async (req, res, next) => {
+  try {
+    const { sessionId } = req.params;
+
+    const order = await Order.findOne({ stripeSessionId: sessionId })
+      .populate('userId', 'name email')
+      .populate('products.productId', 'name image images description');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully',
+      order: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

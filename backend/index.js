@@ -21,6 +21,8 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const seedRoutes = require('./routes/seedRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 // Import middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -87,6 +89,8 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/seed', seedRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api/contact', contactRoutes);
 

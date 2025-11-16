@@ -2,26 +2,44 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { FiTrash2, FiMinus, FiPlus, FiShoppingCart } from 'react-icons/fi';
-import { removeFromCart, updateQuantity } from '../store/slices/cartSlice';
+import { useEffect } from 'react';
+import { removeFromCartAsync, updateQuantityAsync, fetchCart } from '../store/slices/cartSlice';
 
 const Cart = () => {
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const { items, totalAmount, loading } = useSelector((state) => state.cart);
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Fetch cart from backend if user is authenticated
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+    }
+  }, [isAuthenticated, dispatch]);
+
   const handleRemoveItem = (id) => {
-    dispatch(removeFromCart(id));
+    dispatch(removeFromCartAsync(id));
   };
 
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity > 0) {
-      dispatch(updateQuantity({ id, quantity: newQuantity }));
+      dispatch(updateQuantityAsync({ productId: id, quantity: newQuantity }));
     }
   };
 
   const handleCheckout = () => {
     navigate('/checkout');
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading cart...</p>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

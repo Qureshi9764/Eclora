@@ -34,6 +34,9 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      // Clear cart and wishlist from localStorage on logout
+      localStorage.removeItem('cart');
+      localStorage.removeItem('wishlist');
     },
     updateUser: (state, action) => {
       state.user = action.payload;

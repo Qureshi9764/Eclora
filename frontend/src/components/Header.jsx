@@ -1,18 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiLogOut } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiLogOut, FiHeart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logout } from '../store/slices/authSlice';
+import { clearCartAsync } from '../store/slices/cartSlice';
+import { clearWishlistAsync } from '../store/slices/wishlistSlice';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { totalItems } = useSelector((state) => state.cart);
+  const { items: wishlistItems } = useSelector((state) => state.wishlist);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    // Clear cart and wishlist before logging out
+    dispatch(clearCartAsync());
+    dispatch(clearWishlistAsync());
     dispatch(logout());
     navigate('/login');
   };
@@ -69,6 +75,16 @@ const Header = () => {
                 <span>Login</span>
               </Link>
             )}
+
+            {/* Wishlist Icon */}
+            <Link to="/wishlist" className="relative">
+              <FiHeart size={24} className="text-text hover:text-accent transition-colors" />
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </Link>
 
             {/* Cart Icon */}
             <Link to="/cart" className="relative">

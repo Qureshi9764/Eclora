@@ -5,12 +5,15 @@ const {
   getUserOrders,
   getAllOrders,
   updateOrderStatus,
+  getOrderBySession,
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/')
   .post(createOrder)
   .get(protect, admin, getAllOrders);
+
+router.get('/session/:sessionId', getOrderBySession);
 
 router.get('/:userId', protect, getUserOrders);
 

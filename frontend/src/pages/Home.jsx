@@ -9,6 +9,9 @@ import {
   FiFeather,
   FiGift,
   FiShield,
+  FiPackage,
+  FiScissors,
+  FiLayers,
 } from 'react-icons/fi';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
@@ -112,13 +115,34 @@ const Home = () => {
       let response = await productService.getFeaturedProducts();
       let products = response.data || [];
       
-      // If no featured products, get regular products
-      if (products.length === 0) {
+      // Get featured product IDs to avoid duplicates
+      const featuredIds = new Set(products.map(p => p._id));
+      
+      // If we have featured products but less than 8, fill with regular products
+      if (products.length > 0 && products.length < 8) {
+        const regularResponse = await productService.getAllProducts({ limit: 16 }); // Get more to account for duplicates
+        const regularProducts = (regularResponse.data || []).filter(p => !featuredIds.has(p._id));
+        products = [...products, ...regularProducts].slice(0, 8);
+      } else if (products.length === 0) {
+        // If no featured products, get regular products
         response = await productService.getAllProducts({ limit: 8 });
         products = response.data || [];
+      } else {
+        // If we have 8 or more featured products, just take first 8
+        products = products.slice(0, 8);
       }
       
-      setFeaturedProducts(products);
+      // Remove any duplicates by ID (safety check)
+      const uniqueProducts = [];
+      const seenIds = new Set();
+      for (const product of products) {
+        if (product._id && !seenIds.has(product._id)) {
+          seenIds.add(product._id);
+          uniqueProducts.push(product);
+        }
+      }
+      
+      setFeaturedProducts(uniqueProducts.slice(0, 8));
     } catch (error) {
       console.error('Error fetching featured products:', error);
     } finally {
@@ -162,24 +186,28 @@ const Home = () => {
 
   const brandHighlights = [
     {
-      title: 'Clean Ingredients',
-      description: 'We hand-pour soy and coconut wax blends infused with phthalate-free oils.',
+      title: 'Handcrafted Candles',
+      description: 'Hand-poured soy and coconut wax blends infused with phthalate-free oils and layered scent profiles.',
       icon: FiDroplet,
+      category: 'Candles',
     },
     {
-      title: 'Thoughtful Design',
-      description: 'Every vessel and label is crafted to elevate your space and gifting moments.',
-      icon: FiGift,
+      title: 'Seasonal Bouquets',
+      description: 'Fresh floral arrangements styled with designer wrapping and hydrating techniques for lasting beauty.',
+      icon: FiLayers,
+      category: 'Bouquets',
     },
     {
-      title: 'Sustainable Mindset',
-      description: 'Small-batch production, recyclable packaging, and carbon-neutral deliveries.',
-      icon: FiShield,
+      title: 'Custom Gifting',
+      description: 'Curated boxes that pair artisanal treats with branded stationery for VIP moments and celebrations.',
+      icon: FiPackage,
+      category: 'Custom Gifting',
     },
     {
-      title: 'Feather-Light Scents',
-      description: 'Layered scent profiles that linger without overwhelming your senses.',
-      icon: FiFeather,
+      title: 'Hijabi Essentials',
+      description: 'Premium chiffon and jersey hijabs, magnetic pins, and travel-friendly organizers for modern modest wear.',
+      icon: FiScissors,
+      category: 'Hijabi Essentials',
     },
   ];
 
@@ -329,11 +357,11 @@ const Home = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {loading
-            ? Array(4)
+            ? Array(8)
                 .fill(0)
-                .map((_, i) => <SkeletonCard key={i} />)
-            : featuredProducts.slice(0, 4).map((product) => (
-                <ProductCard key={product._id} product={product} />
+                .map((_, i) => <SkeletonCard key={`skeleton-${i}`} />)
+            : featuredProducts.slice(0, 8).map((product, index) => (
+                <ProductCard key={`featured-${product._id}-${index}`} product={product} showBuyNow={true} />
               ))}
         </div>
 
@@ -364,25 +392,30 @@ const Home = () => {
               Why Customers Love Our Atelier
             </h2>
             <p className="text-gray-600 max-w-3xl mx-auto mt-4">
-              From sourcing premium botanicals to hand-finishing every detail, our team obsesses over the little things so your home feels indulgent every day.
+              From hand-poured candles to seasonal bouquets, custom gift boxes, and premium modest wear essentials—we craft each collection with attention to detail, quality materials, and thoughtful design.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {brandHighlights.map(({ title, description, icon: Icon }, index) => (
-              <motion.div
+            {brandHighlights.map(({ title, description, icon: Icon, category }, index) => (
+              <Link
                 key={title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="bg-white/80 backdrop-blur border border-primary/10 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-lg transition"
+                to={`/shop?category=${encodeURIComponent(category)}`}
+                className="block"
               >
-                <div className="w-12 h-12 rounded-full bg-primary/15 text-accent flex items-center justify-center mb-4">
-                  <Icon size={22} />
-                </div>
-                <h3 className="text-xl font-semibold text-secondary mb-2">{title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
-              </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="bg-white/80 backdrop-blur border border-primary/10 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-lg transition cursor-pointer h-full"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/15 text-accent flex items-center justify-center mb-4">
+                    <Icon size={22} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-secondary mb-2">{title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
@@ -406,7 +439,7 @@ const Home = () => {
             <div className="absolute bottom-6 left-6 text-white max-w-xs">
               <p className="uppercase text-sm tracking-[0.3em] mb-2">Inside The Studio</p>
               <p className="text-2xl font-heading font-semibold leading-snug">
-                Each scent profile is layered, cured, and tested for over 30 days.
+                Every product is carefully crafted with attention to detail, quality, and your satisfaction.
               </p>
             </div>
           </motion.div>
@@ -419,17 +452,17 @@ const Home = () => {
           >
             <p className="uppercase tracking-[0.4em] text-accent text-sm">Crafted With Care</p>
             <h2 className="text-4xl font-heading font-bold text-secondary">
-              From Botanical Inspiration To Your Living Room
+              From Our Studio To Your Home
             </h2>
             <p className="text-gray-600 leading-relaxed">
-              Our team of perfumers and artisans experiment with micro-batches to achieve the perfect hot and cold throw. We blend FSC-certified wood wicks, ethically sourced botanicals, and luxurious reusable vessels to keep every collection meaningful and responsible.
+              Whether it's hand-poured candles with layered scents, seasonal bouquets arranged with care, thoughtfully curated gift boxes, or premium modest wear essentials—each product is crafted with attention to quality, sustainability, and meaningful design.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Small-Batch Pours', detail: 'Never mass-produced' },
-                { label: 'Signature Color Palette', detail: 'Curated for modern homes' },
-                { label: 'Refill Program', detail: 'Reduce waste, refill locally' },
-                { label: 'Custom Gifting', detail: 'Corporate + wedding suites' },
+                { label: 'Handcrafted Quality', detail: 'Small-batch, never mass-produced' },
+                { label: 'Premium Materials', detail: 'Ethically sourced and sustainable' },
+                { label: 'Thoughtful Design', detail: 'Curated for modern living' },
+                { label: 'Custom Options', detail: 'Corporate + personal gifting' },
               ].map((item) => (
                 <div key={item.label} className="p-4 rounded-2xl border border-primary/15 bg-white">
                   <p className="text-sm uppercase tracking-wide text-accent font-semibold">{item.label}</p>
