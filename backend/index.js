@@ -30,7 +30,10 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginEmbedderPolicy: false,
+}));
 
 // CORS Configuration
 const allowedOrigins = [
@@ -39,23 +42,41 @@ const allowedOrigins = [
   'http://localhost:3000',
   process.env.CLIENT_URL,
   process.env.ADMIN_URL
-].filter(Boolean); // Remove undefined values
+]
+  .filter(Boolean) // Remove undefined values
+  .map(url => url.trim().replace(/\/$/, '')); // Remove trailing slashes and whitespace
+
+// Log allowed origins in development
+if (process.env.NODE_ENV !== 'production') {
+  console.log('🌐 Allowed CORS Origins:', allowedOrigins);
+}
 
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Check if origin is allowed
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+    // Normalize origin (remove trailing slash)
+    const normalizedOrigin = origin.trim().replace(/\/$/, '');
+    
+    // Check for exact match
+    const isAllowed = allowedOrigins.some(allowed => {
+      const normalizedAllowed = allowed.trim().replace(/\/$/, '');
+      return normalizedOrigin === normalizedAllowed || normalizedOrigin.startsWith(normalizedAllowed);
+    });
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn('⚠️ CORS blocked origin:', normalizedOrigin);
+      console.warn('✅ Allowed origins:', allowedOrigins);
+      callback(new Error(`Not allowed by CORS. Origin: ${normalizedOrigin}`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
