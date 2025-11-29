@@ -2,7 +2,7 @@
 
 ## Deployed Applications
 
-- **Backend API:** https://eclora.onrender.com
+- **Backend API:** https://eclora-sj6w.onrender.com
 - **Frontend:** https://ecloramaison.vercel.app
 - **Admin Panel:** https://eclora-admin.vercel.app
 
@@ -63,13 +63,13 @@ Once you set the environment variables on Render, your deployed apps will be abl
 ### Step 2: Verify Frontend Environment Variable (Vercel)
 - [ ] Go to Vercel dashboard → ecloramaison project
 - [ ] Check Settings → Environment Variables
-- [ ] Verify: `VITE_API_URL=https://eclora.onrender.com/api`
+- [ ] Verify: `VITE_API_URL=https://eclora-sj6w.onrender.com/api`
 - [ ] If not set, add it and redeploy
 
 ### Step 3: Verify Admin Panel Environment Variable (Vercel)
 - [ ] Go to Vercel dashboard → eclora-admin project
 - [ ] Check Settings → Environment Variables
-- [ ] Verify: `VITE_API_URL=https://eclora.onrender.com/api`
+- [ ] Verify: `VITE_API_URL=https://eclora-sj6w.onrender.com/api`
 - [ ] If not set, add it and redeploy
 
 ### Step 4: Test the Connection
@@ -85,7 +85,7 @@ Once you set the environment variables on Render, your deployed apps will be abl
 
 ### Test Backend API
 ```bash
-curl https://eclora.onrender.com
+curl https://eclora-sj6w.onrender.com
 # Should return: {"success":true,"message":"Eclora API is running","version":"1.0.0"}
 ```
 
@@ -93,13 +93,13 @@ curl https://eclora.onrender.com
 1. Visit: https://ecloramaison.vercel.app
 2. Open DevTools Console (F12)
 3. Check Network tab for API calls
-4. Look for calls to `https://eclora.onrender.com/api/*`
+4. Look for calls to `https://eclora-sj6w.onrender.com/api/*`
 
 ### Test Admin Panel Connection
 1. Visit: https://eclora-admin.vercel.app/login
 2. Try to login
 3. Check DevTools Console for errors
-4. Verify API calls go to `https://eclora.onrender.com/api/*`
+4. Verify API calls go to `https://eclora-sj6w.onrender.com/api/*`
 
 ---
 
@@ -116,9 +116,9 @@ curl https://eclora.onrender.com
 ### Problem: "Network Error" or "Failed to fetch"
 
 **Solution:**
-1. Check if backend is running: Visit https://eclora.onrender.com
+1. Check if backend is running: Visit https://eclora-sj6w.onrender.com
 2. Check if `VITE_API_URL` is set in Vercel projects
-3. Verify API URL has `/api` at the end: `https://eclora.onrender.com/api`
+3. Verify API URL has `/api` at the end: `https://eclora-sj6w.onrender.com/api`
 
 ### Problem: Changes not reflecting
 
@@ -153,7 +153,7 @@ Since Render blocks terminal access, follow these steps:
 
 5. **Verify:**
    - Check logs to ensure deployment succeeded
-   - Visit https://eclora.onrender.com to verify it's running
+   - Visit https://eclora-sj6w.onrender.com to verify it's running
 
 ---
 
@@ -176,7 +176,7 @@ Since Render blocks terminal access, follow these steps:
 - Can upload images
 - No CORS errors in console
 
-### ✅ Backend (https://eclora.onrender.com)
+### ✅ Backend (https://eclora-sj6w.onrender.com)
 - Accepts requests from frontend
 - Accepts requests from admin panel
 - Returns proper responses
@@ -188,7 +188,7 @@ Since Render blocks terminal access, follow these steps:
 
 | Component | URL | Status |
 |-----------|-----|--------|
-| Backend | https://eclora.onrender.com | ✅ Deployed |
+| Backend | https://eclora-sj6w.onrender.com | ✅ Deployed |
 | Frontend | https://ecloramaison.vercel.app | ✅ Deployed |
 | Admin Panel | https://eclora-admin.vercel.app | ✅ Deployed |
 | CORS Config | Backend Environment Variables | ⏳ Needs Update |

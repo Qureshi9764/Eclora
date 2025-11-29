@@ -46,7 +46,7 @@ Find or add these three environment variables:
 ### Step 6: Verify Deployment
 1. Check the "Logs" tab to see deployment progress
 2. Wait until you see: "Server running on port..."
-3. Visit: **https://eclora.onrender.com**
+3. Visit: **https://eclora-sj6w.onrender.com**
 4. You should see: `{"success":true,"message":"Eclora API is running","version":"1.0.0"}`
 
 ---
@@ -60,7 +60,7 @@ After updating Render:
 - [ ] `NODE_ENV` is set to `production`
 - [ ] No trailing slashes in URLs
 - [ ] Backend has finished redeploying
-- [ ] https://eclora.onrender.com is responding
+- [ ] https://eclora-sj6w.onrender.com is responding
 
 ---
 
@@ -68,7 +68,7 @@ After updating Render:
 
 ### Test 1: Check Backend
 ```
-Visit: https://eclora.onrender.com
+Visit: https://eclora-sj6w.onrender.com
 Expected: {"success":true,"message":"Eclora API is running","version":"1.0.0"}
 ```
 
@@ -97,7 +97,7 @@ Visit: https://eclora-admin.vercel.app/login
 ```
 Frontend (ecloramaison.vercel.app)
     ↓ (tries to connect)
-Backend (eclora.onrender.com)
+Backend (eclora-sj6w.onrender.com)
     ❌ BLOCKED by CORS
 ```
 
@@ -105,7 +105,7 @@ Backend (eclora.onrender.com)
 ```
 Frontend (ecloramaison.vercel.app)
     ↓ (tries to connect)
-Backend (eclora.onrender.com)
+Backend (eclora-sj6w.onrender.com)
     ✅ ALLOWED (CLIENT_URL matches)
     ✅ Responds with data
 ```
@@ -159,7 +159,7 @@ Render Dashboard
 **Solutions:**
 1. Check Render service status (should be "Live")
 2. Check logs for any errors
-3. Try visiting https://eclora.onrender.com directly
+3. Try visiting https://eclora-sj6w.onrender.com directly
 4. If needed, manually trigger a redeploy
 
 ### Issue: "Can't find environment variables section"
@@ -176,7 +176,7 @@ Render Dashboard
 You'll know it's working when:
 
 1. ✅ Backend deploys successfully (check logs)
-2. ✅ https://eclora.onrender.com returns JSON response
+2. ✅ https://eclora-sj6w.onrender.com returns JSON response
 3. ✅ Frontend loads without CORS errors
 4. ✅ Admin panel loads without CORS errors
 5. ✅ You can fetch data from API on both apps

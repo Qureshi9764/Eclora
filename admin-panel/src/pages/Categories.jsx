@@ -15,6 +15,7 @@ import Modal from '../components/Modal';
 import Loader from '../components/Loader';
 import { Plus, Edit2, Trash2, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getApiUrl } from '../utils/apiConfig';
 
 const schema = yup.object().shape({
   name: yup.string().required('Category name is required'),
@@ -86,7 +87,7 @@ const Categories = () => {
     formData.append('image', file);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://eclora.onrender.com/api';
+      const apiUrl = getApiUrl();
       const response = await fetch(`${apiUrl}/upload`, {
         method: 'POST',
         headers: {
