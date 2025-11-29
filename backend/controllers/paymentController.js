@@ -17,6 +17,8 @@ exports.createCheckoutSession = async (req, res, next) => {
 
     // Debug logging
     console.log('Received checkout request:', JSON.stringify(req.body, null, 2));
+    console.log('CLIENT_URL from env:', process.env.CLIENT_URL);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
 
     // Validate required fields
     if (!items) {
@@ -38,8 +40,17 @@ exports.createCheckoutSession = async (req, res, next) => {
     // Validate and format CLIENT_URL
     let clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     
+    // Handle multiple URLs separated by || (take the first valid one)
+    if (clientUrl && clientUrl.includes('||')) {
+      const urls = clientUrl.split('||').map(url => url.trim()).filter(url => url);
+      // Prefer localhost for development, otherwise take the first one
+      const localhostUrl = urls.find(url => url.includes('localhost'));
+      clientUrl = localhostUrl || urls[0] || 'http://localhost:5173';
+      console.log('Multiple URLs detected, using:', clientUrl);
+    }
+    
     // Remove trailing slash if present
-    clientUrl = clientUrl.replace(/\/$/, '');
+    clientUrl = clientUrl.trim().replace(/\/$/, '');
     
     // Ensure URL has protocol
     if (!clientUrl.startsWith('http://') && !clientUrl.startsWith('https://')) {
@@ -47,12 +58,23 @@ exports.createCheckoutSession = async (req, res, next) => {
     }
 
     // Validate URL format
+    let parsedUrl;
     try {
-      new URL(clientUrl);
+      parsedUrl = new URL(clientUrl);
+      console.log('Valid CLIENT_URL:', clientUrl);
     } catch (urlError) {
+      console.error('CLIENT_URL validation error:', urlError.message);
+      console.error('Original CLIENT_URL:', process.env.CLIENT_URL);
+      console.error('Parsed clientUrl:', clientUrl);
       return res.status(400).json({
         success: false,
-        message: `Invalid CLIENT_URL: ${clientUrl}. Please set a valid URL in your .env file.`,
+        message: `Invalid CLIENT_URL format. Please set a single valid URL in your .env file.`,
+        details: {
+          original: process.env.CLIENT_URL,
+          parsed: clientUrl,
+          error: urlError.message,
+          suggestion: 'Use: CLIENT_URL=http://localhost:5173 (for development) or CLIENT_URL=https://yourdomain.com (for production)'
+        },
       });
     }
 

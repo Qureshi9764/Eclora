@@ -65,23 +65,44 @@ export const paymentService = {
     }
 
     // Production Stripe flow
-    const stripe = await loadStripe(stripePublishableKey);
-    
-    if (!stripe) {
-      throw new Error('Failed to load Stripe. Please check your Stripe publishable key.');
-    }
+    try {
+      const { data } = await paymentService.createCheckoutSession(items);
+      
+      // Use the session URL directly (works with all Stripe.js versions)
+      if (data && data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+        return { success: true, redirecting: true };
+      } else if (data && data.sessionId) {
+        // Fallback: Try using Stripe.js redirect (for older compatibility)
+        const stripe = await loadStripe(stripePublishableKey);
+        
+        if (!stripe) {
+          throw new Error('Failed to load Stripe. Please check your Stripe publishable key.');
+        }
 
-    const { data } = await paymentService.createCheckoutSession(items);
-    
-    const result = await stripe.redirectToCheckout({
-      sessionId: data.sessionId,
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
+        // Try the new redirect method first, fallback to redirectToCheckout
+        if (stripe.redirect) {
+          await stripe.redirect({ sessionId: data.sessionId });
+        } else if (stripe.redirectToCheckout) {
+          const result = await stripe.redirectToCheckout({
+            sessionId: data.sessionId,
+          });
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+        } else {
+          throw new Error('Stripe redirect method not available. Please update @stripe/stripe-js.');
+        }
+        
+        return { success: true, redirecting: true };
+      } else {
+        throw new Error('No session URL or session ID received from server');
+      }
+    } catch (error) {
+      console.error('Stripe redirect error:', error);
+      throw error;
     }
-    
-    return result;
   },
 };
 

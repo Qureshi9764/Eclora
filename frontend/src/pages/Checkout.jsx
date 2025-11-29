@@ -1,14 +1,10 @@
   import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FiLock, FiCreditCard, FiShield } from 'react-icons/fi';
-import { paymentService } from '../services/paymentService';
-import { clearCartAsync } from '../store/slices/cartSlice';
-import PaymentProcessing from '../components/PaymentProcessing';
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -26,10 +22,8 @@ const Checkout = () => {
   const location = useLocation();
   const { items: cartItems, totalAmount: cartTotalAmount } = useSelector((state) => state.cart);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [processingPayment, setProcessingPayment] = useState(false);
   
   // Check if this is a direct buy now purchase
   const buyNowProduct = location.state?.buyNowProduct;
@@ -57,7 +51,6 @@ const Checkout = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      setProcessingPayment(true);
       
       // Prepare order data
       const orderData = {
@@ -82,36 +75,18 @@ const Checkout = () => {
         email: data.email,
         phone: data.phone,
         totalAmount: totalAmount * 1.1, // Including tax
+        isDirectPurchase: isDirectPurchase,
       };
 
-      // Process checkout (Stripe or Demo mode)
-      const result = await paymentService.redirectToCheckout(orderData);
-      
-      // If demo mode, show success message and clear cart (only if not direct purchase)
-      if (result && result.success) {
-        setProcessingPayment(false);
-        // Only clear cart if this was a regular checkout, not a direct purchase
-        if (!isDirectPurchase) {
-          dispatch(clearCartAsync());
-        }
-        navigate('/success', { 
-          state: { 
-            orderId: result.orderId,
-            isDemo: true 
-          } 
-        });
-      }
-      // Note: If Stripe is configured, redirectToCheckout will redirect to Stripe
-      // and we won't reach this point. The success page will be loaded via Stripe redirect.
+      // Navigate to payment page with order data
+      navigate('/payment', { 
+        state: { 
+          orderData: orderData 
+        } 
+      });
     } catch (error) {
       console.error('Checkout error:', error);
-      setProcessingPayment(false);
-      
-      // Show more detailed error message
-      const errorMessage = error.response?.data?.message || error.message || 'An unknown error occurred';
-      const errorDetails = error.response?.data?.details || error.response?.data?.received || '';
-      
-      alert(`❌ Checkout Error: ${errorMessage}${errorDetails ? `\n\nDetails: ${JSON.stringify(errorDetails)}` : ''}\n\nPlease try again or contact support.`);
+      alert(`❌ Error: ${error.message || 'An unknown error occurred'}\n\nPlease try again.`);
     } finally {
       setLoading(false);
     }
@@ -159,9 +134,7 @@ const Checkout = () => {
   }
 
   return (
-    <>
-      {processingPayment && <PaymentProcessing />}
-      <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-heading font-bold text-secondary mb-8">Checkout</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -355,7 +328,7 @@ const Checkout = () => {
                 </>
               ) : (
                 <>
-                  <FiLock size={20} />
+                  <FiCreditCard size={20} />
                   <span>Continue to Payment</span>
                 </>
               )}
@@ -404,8 +377,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
 
