@@ -376,44 +376,52 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Brand Highlights */}
-      <section className="bg-gradient-to-r from-primary/10 via-white to-primary/10 py-20 px-4 overflow-hidden">
-        <div className="container mx-auto">
+      {/* Why Eclora - Refined Brand Highlights */}
+      <section className="relative py-24 px-4 overflow-hidden bg-[#FFF9F8]">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+        <div className="container mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            <p className="uppercase tracking-[0.5em] text-accent text-sm mb-2">
-              The Eclora Promise
+            <p className="uppercase tracking-[0.6em] text-accent text-xs font-bold mb-3">
+              The Eclora Philosophy
             </p>
-            <h2 className="text-4xl font-heading font-bold text-secondary">
-              Why Customers Love Our Atelier
+            <h2 className="text-4xl md:text-5xl font-heading font-bold text-secondary mb-6">
+              Elevating the Everyday
             </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto mt-4">
-              From hand-poured candles to seasonal bouquets, custom gift boxes, and premium modest wear essentials—we craft each collection with attention to detail, quality materials, and thoughtful design.
+            <div className="w-24 h-1 bg-accent/30 mx-auto mb-6"></div>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+              We believe in the beauty of intention. Each Eclora creation is a harmony of traditional artistry and modern elegance, designed to transform your space and soul.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {brandHighlights.map(({ title, description, icon: Icon, category }, index) => (
               <Link
                 key={title}
                 to={`/shop?category=${encodeURIComponent(category)}`}
-                className="block"
+                className="group"
               >
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="bg-white/80 backdrop-blur border border-primary/10 rounded-2xl p-6 shadow-sm hover:-translate-y-1 hover:shadow-lg transition cursor-pointer h-full"
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-3xl p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full flex flex-col items-center text-center"
                 >
-                  <div className="w-12 h-12 rounded-full bg-primary/15 text-accent flex items-center justify-center mb-4">
-                    <Icon size={22} />
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 text-accent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <Icon size={28} />
                   </div>
-                  <h3 className="text-xl font-semibold text-secondary mb-2">{title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+                  <h3 className="text-xl font-heading font-bold text-secondary mb-3">{title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow">{description}</p>
+                  <span className="text-accent font-bold text-xs uppercase tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all">
+                    Explore Collection <FiArrowRight />
+                  </span>
                 </motion.div>
               </Link>
             ))}
@@ -421,61 +429,90 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Craft Story */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* The Eclora Atelier - Redesigned Overlapping Section */}
+      <section className="container mx-auto px-4 py-24 relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+          
+          {/* Visual Side with Overlapping Elements */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative h-[420px] rounded-3xl overflow-hidden shadow-lg"
+            transition={{ duration: 1 }}
+            className="w-full lg:w-1/2 relative"
           >
-            <img
-              src="https://images.pexels.com/photos/545012/pexels-photo-545012.jpeg?auto=compress&cs=tinysrgb&w=1600"
-              alt="Artisan pouring candle wax"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-tr from-secondary/80 to-transparent"></div>
-            <div className="absolute bottom-6 left-6 text-white max-w-xs">
-              <p className="uppercase text-sm tracking-[0.3em] mb-2">Inside The Studio</p>
-              <p className="text-2xl font-heading font-semibold leading-snug">
-                Every product is carefully crafted with attention to detail, quality, and your satisfaction.
-              </p>
+            {/* Main Image */}
+            <div className="relative h-[500px] rounded-[40px] overflow-hidden shadow-2xl z-20">
+              <img
+                src="/assets/images/eclora_atelier.png"
+                alt="Eclora Atelier"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary/40 via-transparent to-transparent"></div>
             </div>
+
+            {/* Overlapping Glass Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="absolute -bottom-10 -right-4 lg:-right-12 z-30 bg-white/60 backdrop-blur-2xl p-8 rounded-[30px] border border-white/80 shadow-2xl max-w-[280px]"
+            >
+              <p className="text-accent font-bold uppercase tracking-widest text-xs mb-3">Legacy of Craft</p>
+              <p className="text-secondary font-heading text-xl font-bold leading-tight">
+                "We don't just sell products; we curate moments of serenity."
+              </p>
+              <p className="text-gray-500 text-sm mt-4 font-medium">— The Eclora Founder</p>
+            </motion.div>
+
+            {/* Accent Shapes */}
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border-2 border-primary/10 rounded-[50px] -rotate-3 scale-105 -z-10"></div>
           </motion.div>
 
+          {/* Content Side */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
+            transition={{ duration: 1 }}
+            className="w-full lg:w-1/2 space-y-8"
           >
-            <p className="uppercase tracking-[0.4em] text-accent text-sm">Crafted With Care</p>
-            <h2 className="text-4xl font-heading font-bold text-secondary">
-              From Our Studio To Your Home
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              Whether it's hand-poured candles with layered scents, seasonal bouquets arranged with care, thoughtfully curated gift boxes, or premium modest wear essentials—each product is crafted with attention to quality, sustainability, and meaningful design.
+            <div className="space-y-4">
+              <p className="uppercase tracking-[0.5em] text-accent text-sm font-bold">The Eclora Atelier</p>
+              <h2 className="text-4xl md:text-6xl font-heading font-bold text-secondary leading-tight">
+                Crafted with Soul, <br />
+                <span className="text-accent italic">Delivered with Love.</span>
+              </h2>
+            </div>
+            
+            <p className="text-gray-600 text-lg leading-relaxed">
+              Every item in our collection is born from a desire for beauty and a commitment to quality. Whether it's the warm amber glow of our signature candles or the effortless grace of our modest wear, we ensure every detail is perfected for your satisfaction.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-4">
               {[
-                { label: 'Handcrafted Quality', detail: 'Small-batch, never mass-produced' },
-                { label: 'Premium Materials', detail: 'Ethically sourced and sustainable' },
-                { label: 'Thoughtful Design', detail: 'Curated for modern living' },
-                { label: 'Custom Options', detail: 'Corporate + personal gifting' },
-              ].map((item) => (
-                <div key={item.label} className="p-4 rounded-2xl border border-primary/15 bg-white">
-                  <p className="text-sm uppercase tracking-wide text-accent font-semibold">{item.label}</p>
-                  <p className="text-secondary font-medium mt-1">{item.detail}</p>
+                { label: 'Artisanal Soul', detail: 'Small batches, timeless techniques.', icon: FiDroplet },
+                { label: 'Pure Materials', detail: 'Ethically sourced, toxin-free luxury.', icon: FiFeather },
+                { label: 'Bespoke Touch', detail: 'Tailored gifting for VIP moments.', icon: FiGift },
+                { label: 'Global Heritage', detail: 'Designs inspired by world travels.', icon: FiShield },
+              ].map((item, idx) => (
+                <div key={item.label} className="group flex items-start gap-4 p-4 rounded-2xl hover:bg-white transition-colors duration-300">
+                  <div className="mt-1 text-accent group-hover:scale-110 transition-transform">
+                    <item.icon size={20} />
+                  </div>
+                  <div>
+                    <h4 className="text-secondary font-bold text-sm uppercase tracking-wide">{item.label}</h4>
+                    <p className="text-gray-500 text-sm mt-1">{item.detail}</p>
+                  </div>
                 </div>
               ))}
             </div>
+
             <Link
               to="/about"
-              className="inline-flex items-center gap-2 text-accent font-semibold hover:text-primary transition"
+              className="inline-flex items-center group gap-3 bg-secondary text-white px-10 py-5 rounded-full font-bold hover:bg-accent transition-all duration-500 shadow-xl hover:shadow-accent/30"
             >
-              Discover our story
-              <FiArrowRight />
+              <span>Our Full Story</span>
+              <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
             </Link>
           </motion.div>
         </div>
